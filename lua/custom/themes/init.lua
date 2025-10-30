@@ -1,5 +1,6 @@
 -- Pick which theme to use
-local theme_name = 'gruvbox' --
+-- tokyonight, gruvbox, catppuccin
+local theme_name = 'catppuccin' --
 
 -- Loading it
 local ok, theme = pcall(require, 'custom.themes.' .. theme_name)
