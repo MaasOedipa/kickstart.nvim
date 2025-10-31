@@ -9,17 +9,26 @@ return {
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',
   },
+  auto_close = true,
+  auto_open = false,
   lazy = false,
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
     filesystem = {
+      filtered_items = {
+        hide_dotfiles = false,
+        hide_gitignored = false,
+      },
       window = {
         mappings = {
           ['\\'] = 'close_window',
         },
+        position = 'left',
+        width = '20',
       },
+      hijack_netrw_behavior = 'open_default',
     },
   },
 }
