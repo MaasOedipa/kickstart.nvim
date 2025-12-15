@@ -32,6 +32,7 @@ vim.o.undofile = true
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.o.ignorecase = true
 vim.o.smartcase = true
+vim.o.smartindent = true
 
 -- Keep signcolumn on by default
 vim.o.signcolumn = 'yes'
@@ -59,7 +60,7 @@ vim.o.cursorline = true
 vim.o.scrolloff = 15
 
 vim.o.confirm = true
-
+vim.o.wrap = false
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -96,6 +97,11 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+vim.keymap.set('n', '<leader>tw', function()
+  vim.wo.wrap = not vim.wo.wrap
+  print('Wrap ' .. (vim.wo.wrap and 'enabled' or 'disabled'))
+end, { desc = 'Toggle line wrap' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
