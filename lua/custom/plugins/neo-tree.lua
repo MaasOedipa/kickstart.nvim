@@ -25,6 +25,13 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['P'] = {
+            'toggle_preview',
+            config = {
+              width = '10%',
+            },
+          },
+          ['l'] = 'focus_preview',
         },
         position = 'left',
         width = '20',
