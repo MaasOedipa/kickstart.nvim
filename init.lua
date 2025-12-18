@@ -103,6 +103,22 @@ vim.keymap.set('n', '<leader>tw', function()
   print('Wrap ' .. (vim.wo.wrap and 'enabled' or 'disabled'))
 end, { desc = 'Toggle line wrap' })
 
+vim.keymap.set('n', '<leader>tr', function()
+  -- Ensure line wrapping is enabled
+  if vim.bo.filetype ~= 'markdown' then
+    return
+  end
+
+  vim.opt_local.wrap = true
+  vim.opt_local.linebreak = true
+
+  -- Toggle RenderMarkdown
+  vim.cmd 'RenderMarkdown toggle'
+
+  print 'RenderMarkdown enabled with line wrap'
+end, { desc = 'Toggle RenderMarkdown + enable wrap' })
+
+vim.keymap.set('n', '<leader>tp', '<cmd>RenderMarkdown preview<CR>', { desc = 'Toggle Render md preview' })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
