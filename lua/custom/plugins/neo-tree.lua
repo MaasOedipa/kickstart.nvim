@@ -14,6 +14,7 @@ return {
   lazy = false,
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '½', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
     filesystem = {
@@ -25,6 +26,7 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['½'] = 'close_window',
           ['P'] = {
             'toggle_preview',
             config = {
