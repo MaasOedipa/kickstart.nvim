@@ -2,8 +2,7 @@
 
 Personal fork of kickstart.nvim
 
-Link to kickstart repo
-https://github.com/nvim-lua/kickstart.nvim
+[Link to kickstart repo] (https://github.com/nvim-lua/kickstart.nvim)
 
 
 ## Installation
