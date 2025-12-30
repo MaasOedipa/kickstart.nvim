@@ -5,6 +5,7 @@ return {
   opts = {
     disabled = false,
     max_time = 500,
+    max_count = 5,
     notification = true,
   },
 }
