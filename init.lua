@@ -77,6 +77,19 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+-- Disable plugins
+local notify_enabled = true
+
+vim.keymap.set('n', '<leader>un', function()
+  notify_enabled = not notify_enabled
+
+  if notify_enabled then
+    vim.notify = require 'notify'
+  else
+    vim.notify = function() end
+  end
+end, { desc = 'Toggle notifications' })
+
 -- TIP: Disable arrow keys in normal mode
 vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
