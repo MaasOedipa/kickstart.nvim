@@ -20,9 +20,7 @@ vim.o.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
-vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
-end)
+vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -130,9 +128,7 @@ end, { desc = 'Toggle line wrap' })
 
 vim.keymap.set('n', '<leader>tr', function()
   -- Ensure line wrapping is enabled
-  if vim.bo.filetype ~= 'markdown' then
-    return
-  end
+  if vim.bo.filetype ~= 'markdown' then return end
 
   vim.opt_local.wrap = true
   vim.opt_local.linebreak = true
@@ -160,9 +156,7 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.hl.on_yank()
-  end,
+  callback = function() vim.hl.on_yank() end,
 })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
@@ -171,9 +165,7 @@ local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    error('Error cloning lazy.nvim:\n' .. out)
-  end
+  if vim.v.shell_error ~= 0 then error('Error cloning lazy.nvim:\n' .. out) end
 
   -- This autocommand runs after a plugin is installed or updated and
   --  runs the appropriate build command for that plugin if necessary.
@@ -841,22 +833,21 @@ end
 -- SECTION 9: OPTIONAL EXAMPLES / NEXT STEPS
 -- kickstart.plugins.* examples
 -- ============================================================
-do
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
+-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
+-- init.lua. If you want these files, they are in the repository, so you can just download them and
+-- place them in the correct locations.
 
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
-
+-- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
+--
+--  Here are some example plugins that I've included in the Kickstart repository.
+--  Uncomment any of the lines below to enable them (you will need to restart nvim).
+--
+-- require 'kickstart.plugins.debug',
+-- require 'kickstart.plugins.indent_line',
+-- require 'kickstart.plugins.lint',
+-- require 'kickstart.plugins.autopairs',
+-- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+require('lazy').setup({
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
@@ -893,15 +884,12 @@ do
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
-
 vim.lsp.config('fsautocomplete', {
   cmd = { 'fsautocomplete', '--adaptive-lsp-server-enabled' },
 
   filetypes = { 'fsharp' },
 
-  root_dir = function(bufnr)
-    return vim.fs.root(bufnr, { '*.fsproj', '.git' })
-  end,
+  root_dir = function(bufnr) return vim.fs.root(bufnr, { '*.fsproj', '.git' }) end,
 
   settings = {
     FsAutoComplete = {
