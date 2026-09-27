@@ -92,6 +92,13 @@ do
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
+  -- Ensure config directory is in runtimepath if loaded from custom path (e.g. nvim -u init.lua)
+  local current_file = debug.getinfo(1, 'S').source:sub(2)
+  local config_dir = vim.fs.dirname(current_file)
+  if config_dir and vim.fn.stdpath 'config' ~= config_dir then
+    vim.opt.rtp:prepend(config_dir)
+  end
+
   -- Set <space> as the leader key
   -- See `:help mapleader`
   --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -99,7 +106,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -110,7 +117,7 @@ do
   vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -133,19 +140,20 @@ do
   -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
   vim.o.ignorecase = true
   vim.o.smartcase = true
+  vim.o.smartindent = true
 
   -- Keep signcolumn on by default
   vim.o.signcolumn = 'yes'
 
   -- Decrease update time
-  vim.o.updatetime = 250
+  vim.o.updatetime = 150
 
   -- Decrease mapped sequence wait time
   vim.o.timeoutlen = 300
 
   -- Configure how new splits should be opened
   vim.o.splitright = true
-  vim.o.splitbelow = true
+  vim.o.splitbelow = false
 
   -- Sets how neovim will display certain whitespace characters in the editor.
   --  See `:help 'list'`
@@ -165,12 +173,13 @@ do
   vim.o.cursorline = true
 
   -- Minimal number of screen lines to keep above and below the cursor.
-  vim.o.scrolloff = 10
+  vim.o.scrolloff = 15
 
   -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+  vim.o.wrap = false
 end
 
 -- ============================================================
@@ -211,6 +220,19 @@ do
 
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+  local lsp_show = true
+  vim.keymap.set('n', '<leader>ul', function()
+    lsp_show = not lsp_show
+
+    if lsp_show then
+      vim.lsp.handlers['window/showMessage'] = vim.lsp.handlers['window/showMessageDefault']
+      print 'LSP messages ON'
+    else
+      vim.lsp.handlers['window/showMessage'] = function() end
+      print 'LSP messages OFF'
+    end
+  end, { desc = 'Toggle LSP messages' })
+
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
   -- is not what someone will guess without a bit more experience.
@@ -219,11 +241,24 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+  -- Disable plugins
+  local notify_enabled = true
+
+  vim.keymap.set('n', '<leader>un', function()
+    notify_enabled = not notify_enabled
+
+    if notify_enabled then
+      vim.notify = require 'notify'
+    else
+      vim.notify = function() end
+    end
+  end, { desc = 'Toggle notifications' })
+
   -- TIP: Disable arrow keys in normal mode
-  -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-  -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-  -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-  -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+  vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+  vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+  vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+  vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
   -- Keybinds to make split navigation easier.
   --  Use CTRL+<hjkl> to switch between windows
@@ -234,6 +269,28 @@ do
   vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
   vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+  vim.keymap.set('n', '<leader>tw', function()
+    vim.wo.wrap = not vim.wo.wrap
+    print('Wrap ' .. (vim.wo.wrap and 'enabled' or 'disabled'))
+  end, { desc = 'Toggle line wrap' })
+
+  vim.keymap.set('n', '<leader>tr', function()
+    -- Ensure line wrapping is enabled
+    if vim.bo.filetype ~= 'markdown' then
+      return
+    end
+
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+
+    -- Toggle RenderMarkdown
+    vim.cmd 'RenderMarkdown toggle'
+
+    print 'RenderMarkdown enabled with line wrap'
+  end, { desc = 'Toggle RenderMarkdown + enable wrap' })
+
+  vim.keymap.set('n', '<leader>tp', '<cmd>RenderMarkdown preview<CR>', { desc = 'Toggle Render md preview' })
+
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
   -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -242,6 +299,16 @@ do
 
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'fsharp',
+    callback = function()
+      vim.opt_local.expandtab = true
+      vim.opt_local.tabstop = 4
+      vim.opt_local.shiftwidth = 4
+      vim.opt_local.softtabstop = 4
+    end,
+  })
 
   -- Highlight when yanking (copying) text
   --  Try it with `yap` in normal mode
@@ -396,7 +463,7 @@ do
       vim.keymap.set('n', '<leader>hq', gitsigns.setqflist, { desc = 'git hunk [q]uickfix list (all changes in this file)', buf = bufnr })
       -- Toggles
       vim.keymap.set('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line', buf = bufnr })
-      vim.keymap.set('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git intra-line [w]ord diff', buf = bufnr })
+      -- vim.keymap.set('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git intra-line [w]ord diff', buf = bufnr })
       -- Text object
       vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = 'text object [i]nside [h]unk', buf = bufnr })
     end,
@@ -432,9 +499,8 @@ do
   }
 
   -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  -- Theme loading is managed by `custom.themes` (see Section 10).
+  -- vim.cmd.colorscheme 'tokyonight-night'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -622,7 +688,7 @@ do
   )
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
+  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim in .config' })
 end
 
 -- ============================================================
@@ -656,9 +722,9 @@ do
   -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
   -- and elegantly composed help section, `:help lsp-vs-treesitter`
 
-  -- Useful status updates for LSP.
-  vim.pack.add { gh 'j-hui/fidget.nvim' }
-  require('fidget').setup {}
+  -- Useful status updates for LSP (disabled in user config in favor of nvim-notify).
+  -- vim.pack.add { gh 'j-hui/fidget.nvim' }
+  -- require('fidget').setup {}
 
   --  This function gets run when an LSP attaches to a particular buffer.
   --    That is to say, every time a new file is opened that is associated with
@@ -911,7 +977,7 @@ do
     completion = {
       -- By default, you may press `<c-space>` to show the documentation.
       -- Optionally, set `auto_show = true` to show the documentation after a delay.
-      documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      documentation = { auto_show = false, auto_show_delay_ms = 500, window = { max_width = 30, max_height = 8 } },
     },
 
     sources = {
@@ -1023,7 +1089,7 @@ do
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
   -- For independent modules, uncomment the convenience loader:
-  -- require 'custom.plugins'
+  require 'custom.plugins'
   --
   -- `custom.plugins` automatically loads files from that directory, but their
   -- order is unspecified. If plugins depend on each other, keep them in the same
@@ -1033,7 +1099,38 @@ do
   -- require 'custom.plugins.colorscheme'
   -- require 'custom.plugins.ui'
   -- require 'custom.plugins.git'
+  require 'custom.themes'
 end
+
+vim.lsp.config('fsautocomplete', {
+  cmd = { 'fsautocomplete', '--adaptive-lsp-server-enabled' },
+
+  filetypes = { 'fsharp' },
+
+  root_dir = function(bufnr)
+    return vim.fs.root(bufnr, { '*.fsproj', '.git' })
+  end,
+
+  settings = {
+    FsAutoComplete = {
+      LazyProjectWorkspace = true,
+      BackgroundAnalysis = false,
+      ExternalAutocomplete = false,
+      Linter = false,
+      UnionCaseStubGeneration = false,
+      RecordStubGeneration = false,
+      InterfaceStubGeneration = false,
+    },
+  },
+
+  on_attach = function(client, bufnr)
+    client.server_capabilities.semanticTokensProvider = nil
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
+})
+
+vim.lsp.enable 'fsautocomplete'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
