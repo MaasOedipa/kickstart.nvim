@@ -48,6 +48,12 @@ External Requirements:
 
 ### Install Kickstart
 
+After cloning, move files into ~/.config/nvim/
+
+### Getting Started
+
+[The Only Video You Need to Get Started with Neovim](https://youtu.be/m8C0Cq9Uv9o)
+
 > [!NOTE]
 > [Backup](#FAQ) your previous configuration (if any exists)
 
