@@ -1,5 +1,6 @@
-return {
-  { 'folke/tokyonight.nvim', lazy = false, priority = 1000 },
-  { 'ellisonleao/gruvbox.nvim', lazy = false, priority = 1000 },
-  { 'catppuccin/nvim', name = 'catppuccin', lazy = false, priority = 1000 },
+-- Theme plugins
+vim.pack.add {
+  'https://github.com/folke/tokyonight.nvim',
+  'https://github.com/ellisonleao/gruvbox.nvim',
+  'https://github.com/catppuccin/nvim',
 }
