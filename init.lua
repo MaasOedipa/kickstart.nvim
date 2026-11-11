@@ -802,6 +802,7 @@ do
     -- clangd = {},
     -- gopls = {},
     -- pyright = {},
+    pylsp = {},
     -- tsc = {},
     --
     -- Some languages (like rust) have entire language plugins that can be useful:
@@ -857,7 +858,7 @@ do
 
   -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
   require('mason-lspconfig').setup {
-    automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+    automatic_enable = true, -- Automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
   }
 
   -- Ensure the servers and tools above are installed
@@ -878,6 +879,14 @@ do
     vim.lsp.config(name, server)
     vim.lsp.enable(name)
   end
+
+  -- Neovim 0.12+ provides built-in `:lsp` subcommands and replaces `:LspInfo` with `:checkhealth vim.lsp`.
+  -- Alias `:LspInfo` and `:lspinfo` for backwards compatibility.
+  vim.api.nvim_create_user_command('LspInfo', 'checkhealth vim.lsp', { desc = 'Alias to checkhealth vim.lsp' })
+  vim.api.nvim_create_user_command('LspLog', function()
+    vim.cmd(string.format('tabnew %s', vim.lsp.log.get_filename()))
+  end, { desc = 'Opens the Nvim LSP client log' })
+  vim.cmd.cnoreabbrev('lspinfo LspInfo')
 end
 
 -- ============================================================
@@ -981,7 +990,7 @@ do
     },
 
     sources = {
-      default = { 'lsp', 'path', 'snippets' },
+      default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
 
     snippets = { preset = 'luasnip' },
